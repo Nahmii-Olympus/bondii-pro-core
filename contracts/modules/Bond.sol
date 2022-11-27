@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 
 import "../libraries/SafeMath.sol";
 import "../libraries/SafeERC20.sol";
+import "../libraries/FixedPoint.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/ITreasury.sol";
 import "./Ownable.sol";
@@ -25,6 +26,7 @@ contract BondiiProBond is Ownable {
      */
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
+    using FixedPoint for *;
 
     
     /* 
@@ -87,7 +89,7 @@ contract BondiiProBond is Ownable {
     mapping(address => uint256) lastDecay;
     mapping(address => Terms) terms;
     mapping(address => Adjust) adjustment; // this would be used to change setting of the bond using the pricipal_token(lp) as the key
-    mapping( address => Bond ) public bondInfo; // this is and information of the bond a user has made
+    mapping( address => Bond[] ) public bondInfo; // this is and information of the bond a user has made
     mapping(address => bool) bondActive; // this variable would be used to toogle bonding process and 
 
     
@@ -215,10 +217,90 @@ contract BondiiProBond is Ownable {
      *  @notice reduce total debt
      */
     function decayDebt(address _principalToken) internal {
-        totalDebt[_principalToken] = totalDebt[_principalToken].sub( debtDecay() );
+        totalDebt[_principalToken] = totalDebt[_principalToken].sub( debtDecay(_principalToken) );
         lastDecay[_principalToken] = block.number;
     }
 
+    /**
+     *  @notice calculate current ratio of debt to payout token supply
+     *  @notice protocols using Olympus Pro should be careful when quickly adding large %s to total supply
+     *  @return debtRatio_ uint
+     */
+    function debtRatio(address _principalToken) public view returns ( uint debtRatio_ ) {   
+        debtRatio_ = FixedPoint.fraction( 
+            currentDebt(_principalToken).mul( 10 ** payoutToken.decimals() ), 
+            payoutToken.totalSupply()
+        ).decode112with18().div( 1e18 );
+    }
+
+    /**
+     *  @notice calculate user's interest due for new bond, accounting for Olympus Fee. 
+     If fee is in payout then takes in the already calcualted value. If fee is in principal token 
+     than takes in the amount of principal being deposited and then calculautes the fee based on
+     the amount of principal and not in terms of the payout token
+     *  @param _value uint
+     *  @return _payout uint
+     *  @return _fee uint
+     */
+    function payoutFor( uint _value, address _principalToken ) public view returns ( uint256 _payout, uint256 _fee) {
+        _payout = FixedPoint.fraction( _value, bondPrice(_principalToken) ).decode112with18().div( 1e11 );
+    }
+
+
+    /**
+     *  @notice calculate current bond premium
+     *  @return price_ uint
+     */
+    function bondPrice(address _principalToken) public view returns ( uint price_ ) {        
+        price_ = terms[_principalToken].controlVariable.mul( debtRatio(_principalToken) ).div( 10 ** (uint256(payoutToken.decimals()).sub(5)) );
+        if ( price_ < terms[_principalToken].minimumPrice ) {
+            price_ = terms[_principalToken].minimumPrice;
+        }
+    }
+
+    /**
+     *  @notice determine maximum bond size
+     *  @return uint
+     */
+    function maxPayout(address _principalToken) public view returns ( uint ) {
+        return payoutToken.totalSupply().mul( terms[_principalToken].maxPayout ).div( 100000 );
+    }
+
+    /**
+     *  @notice calculate current bond price and remove floor if above
+     *  @return price_ uint
+     */
+    function _bondPrice(address _principalToken) internal returns ( uint price_ ) {
+        price_ = terms[_principalToken].controlVariable.mul( debtRatio(_principalToken) ).div( 10 ** (uint256(payoutToken.decimals()).sub(5)) );
+        if ( price_ < terms[_principalToken].minimumPrice ) {
+            price_ = terms[_principalToken].minimumPrice;        
+        } else if ( terms[_principalToken].minimumPrice != 0 ) {
+            terms[_principalToken].minimumPrice = 0;
+        }
+    }
+
+    /**
+     *  @notice makes incremental adjustment to control variable
+     */
+    function adjust(address _principalToken) internal {
+        uint256 blockCanAdjust = adjustment[_principalToken].lastBlock.add( adjustment[_principalToken].buffer );
+        if( adjustment[_principalToken].rate != 0 && block.number >= blockCanAdjust ) {
+            uint256 initial = terms[_principalToken].controlVariable;
+            if ( adjustment[_principalToken].add ) {
+                terms[_principalToken].controlVariable = terms[_principalToken].controlVariable.add( adjustment[_principalToken].rate );
+                if ( terms[_principalToken].controlVariable >= adjustment[_principalToken].target ) {
+                    adjustment[_principalToken].rate = 0;
+                }
+            } else {
+                terms[_principalToken].controlVariable = terms[_principalToken].controlVariable.sub( adjustment[_principalToken].rate );
+                if ( terms[_principalToken].controlVariable <= adjustment[_principalToken].target ) {
+                    adjustment[_principalToken].rate = 0;
+                }
+            }
+            adjustment[_principalToken].lastBlock = block.number;
+            emit ControlVariableAdjustment( initial, terms[_principalToken].controlVariable, adjustment[_principalToken].rate, adjustment[_principalToken].add );
+        }
+    }
 
 
     /**
@@ -233,59 +315,44 @@ contract BondiiProBond is Ownable {
 
         decayDebt(_principalToken);
 
-
-
-        uint value = customTreasury.valueOfToken( address(principalToken), _amount );
+        uint value = customTreasury.valueOfToken( address(_principalToken), _amount );
 
         uint payout;
         uint fee;
 
-        if(feeInPayout) {
-            (payout, fee) = payoutFor( value ); // payout and fee is computed
-        } else {
-            (payout, fee) = payoutFor( _amount ); // payout and fee is computed
-            _amount = _amount.sub(fee);
-        }
+        (payout, fee) = payoutFor( value ); // payout and fee is computed
 
         require( payout >= 10 ** payoutToken.decimals() / 100, "Bond too small" ); // must be > 0.01 payout token ( underflow protection )
         require( payout <= maxPayout(), "Bond too large"); // size protection because there is no slippage
         
         // total debt is increased
-        totalDebt = totalDebt.add( value );
+        totalDebt[_principalToken] = totalDebt[_principalToken].add( value );
 
-        require( totalDebt <= terms.maxDebt, "Max capacity reached" );
+        require( totalDebt[_principalToken] <= terms[_principalToken].maxDebt, "Max capacity reached" );
                 
         // depositor info is stored
-        bondInfo[ _depositor ] = Bond({ 
+        Bond memory d = Bond({ 
             payout: bondInfo[ _depositor ].payout.add( payout ),
-            vesting: terms.vestingTerm,
+            vesting: terms[_principalToken].vestingTerm,
             lastBlock: block.number,
-            truePricePaid: trueBondPrice()
+            truePricePaid: bondPrice(),
+            principalToken: _principalToken
         });
+        bondInfo[ _depositor ].push(d);
 
-        totalPrincipalBonded = totalPrincipalBonded.add(_amount); // total bonded increased
-        totalPayoutGiven = totalPayoutGiven.add(payout); // total payout increased
-        payoutSinceLastSubsidy = payoutSinceLastSubsidy.add( payout ); // subsidy counter increased
+        totalPrincipalBonded[_principalToken] = totalPrincipalBonded[_principalToken].add(_amount); // total bonded increased
+        totalPayoutGiven[_principalToken] = totalPayoutGiven[_principalToken].add(payout); // total payout increased
 
-        if(feeInPayout) {
-            customTreasury.sendPayoutTokens( payout.add(fee) );
-            if(fee != 0) { // if fee, send to Olympus treasury
-                payoutToken.safeTransfer(olympusTreasury, fee);
-            }
-        } else {
-            customTreasury.sendPayoutTokens( payout );
-            if(fee != 0) { // if fee, send to Olympus treasury
-                principalToken.safeTransferFrom( msg.sender, olympusTreasury, fee );
-            }
-        }
 
-        principalToken.safeTransferFrom( msg.sender, address(customTreasury), _amount ); // transfer principal bonded to custom treasury
+        customTreasury.sendPayoutTokens( payout );
+
+        IERC20(_principalToken).safeTransferFrom( msg.sender, address(customTreasury), _amount ); // transfer principal bonded to custom treasury
 
         // indexed events are emitted
         emit BondCreated( _amount, payout, block.number.add( terms.vestingTerm ) );
-        emit BondPriceChanged( _bondPrice(), debtRatio() );
+        emit BondPriceChanged( _bondPrice(_principalToken), debtRatio() );
 
-        adjust(); // control variable is adjusted
+        adjust(_principalToken); // control variable is adjusted
         return payout; 
     }
     
