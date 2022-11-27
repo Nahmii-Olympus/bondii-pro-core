@@ -16,9 +16,9 @@ module.exports = {
   mocha: {
     timeout: 100000000,
   },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
-  },
+  // etherscan: {
+  //   apiKey: process.env.ETHERSCAN_API_KEY,
+  // },
   networks: {
     hardhat: {
       blockGasLimit: 20000000,
@@ -28,13 +28,13 @@ module.exports = {
     localhost: {
       timeout: 8000000,
     },
-    kovan: {
-      url: process.env.KOVAN_URL,
-      accounts: [process.env.SECRET],
-      blockGasLimit: 200000000000,
-      gasPrice: 10000000000,
-      timeout: 90000,
-    },
+    // kovan: {
+    //   url: process.env.KOVAN_URL,
+    //   accounts: [process.env.SECRET],
+    //   blockGasLimit: 200000000000,
+    //   gasPrice: 10000000000,
+    //   timeout: 90000,
+    // },
   },
   gasReporter: {
     currency: "USD",
@@ -50,7 +50,7 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.8.4",
+        version: "0.8.9",
         settings: {
           optimizer: {
             enabled: true,
