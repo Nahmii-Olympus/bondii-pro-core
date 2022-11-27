@@ -54,13 +54,12 @@ contract Treasury is Ownable {
 
     /**
      *  @notice bond contract recieves payout tokens
-     *  @param _payout_token_address address
      *  @param _amountPayoutToken uint
      */
-    function sendPayoutTokens(address _payout_token_address, uint _amountPayoutToken) external {
-        require(bondContract[_payout_token_address], "address is not a bond contract");
+    function sendPayoutTokens(uint _amountPayoutToken) external {
+        require(bondContract[msg.sender], "address is not a bond contract");
         IERC20(bondPayoutToken).safeTransfer(msg.sender, _amountPayoutToken);
-        emit BondPayoutToken(_payout_token_address, _amountPayoutToken);
+        emit BondPayoutToken(msg.sender, _amountPayoutToken);
     }
 
     /**

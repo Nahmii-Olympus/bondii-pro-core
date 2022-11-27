@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 interface ITreasury {
-    function sendPayoutTokens(address _payout_token_address, uint _amountPayoutToken) external;
+    function sendPayoutTokens(uint _amountPayoutToken) external;
 
     function sendStakingReward(address _payout_token_address, uint _amount) external;
 
@@ -13,4 +13,7 @@ interface ITreasury {
     function whitelistStakingContract(address _new_staking) external;
 
     function dewhitelistStakingContract(address _stakingContract) external;
+
+    function valueOfToken( address _principalTokenAddress, uint _amount ) external view returns ( uint value_ );
+    function payoutToken() external view returns (address);
 }

@@ -320,10 +320,10 @@ contract BondiiProBond is Ownable {
         uint payout;
         uint fee;
 
-        (payout, fee) = payoutFor( value ); // payout and fee is computed
+        (payout, fee) = payoutFor( value, _principalToken); // payout and fee is computed
 
         require( payout >= 10 ** payoutToken.decimals() / 100, "Bond too small" ); // must be > 0.01 payout token ( underflow protection )
-        require( payout <= maxPayout(), "Bond too large"); // size protection because there is no slippage
+        require( payout <= maxPayout(_principalToken), "Bond too large"); // size protection because there is no slippage
         
         // total debt is increased
         totalDebt[_principalToken] = totalDebt[_principalToken].add( value );
@@ -332,10 +332,10 @@ contract BondiiProBond is Ownable {
                 
         // depositor info is stored
         Bond memory d = Bond({ 
-            payout: bondInfo[ _depositor ].payout.add( payout ),
+            payout: bondInfo[ _depositor ][ bondInfo[ _depositor ].length].payout.add( payout ),
             vesting: terms[_principalToken].vestingTerm,
             lastBlock: block.number,
-            truePricePaid: bondPrice(),
+            truePricePaid: bondPrice(_principalToken),
             principalToken: _principalToken
         });
         bondInfo[ _depositor ].push(d);
@@ -349,8 +349,8 @@ contract BondiiProBond is Ownable {
         IERC20(_principalToken).safeTransferFrom( msg.sender, address(customTreasury), _amount ); // transfer principal bonded to custom treasury
 
         // indexed events are emitted
-        emit BondCreated( _amount, payout, block.number.add( terms.vestingTerm ) );
-        emit BondPriceChanged( _bondPrice(_principalToken), debtRatio() );
+        emit BondCreated( _amount, payout, block.number.add( terms[_principalToken].vestingTerm ) );
+        emit BondPriceChanged( _bondPrice(_principalToken), debtRatio(_principalToken) );
 
         adjust(_principalToken); // control variable is adjusted
         return payout; 
