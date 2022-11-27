@@ -28,7 +28,7 @@ module.exports = {
     localhost: {
       timeout: 8000000,
     },
-    kovan: {
+    mumbai: {
       url: process.env.KOVAN_URL,
       accounts: [process.env.SECRET],
       blockGasLimit: 200000000000,
