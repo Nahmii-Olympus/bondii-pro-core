@@ -11,13 +11,9 @@ pragma solidity ^0.8.0;
 import { LibDiamond } from "./libraries/LibDiamond.sol";
 import { IDiamondCut } from "./interfaces/IDiamondCut.sol";
 
-import { AppStorageTreasury } from "./libraries/LibAppStorage.sol";
-
 contract Diamond {
     
-    AppStorageTreasury internal s;
-
-    constructor(address _contractOwner, address _diamondCutFacet, address _bondPayoutToken, address _stakingPayoutToken) payable {        
+    constructor(address _contractOwner, address _diamondCutFacet) payable {        
         LibDiamond.setContractOwner(_contractOwner);
 
         // Add the diamondCut external function from the diamondCutFacet
@@ -29,11 +25,7 @@ contract Diamond {
             action: IDiamondCut.FacetCutAction.Add, 
             functionSelectors: functionSelectors
         });
-        LibDiamond.diamondCut(cut, address(0), "");   
-
-        // state variable for Treasury present in the app storage
-        s.bondPayoutToken = _bondPayoutToken;
-        s.stakingPayoutToken = _stakingPayoutToken;     
+        LibDiamond.diamondCut(cut, address(0), "");     
     }
 
     // Find facet for function that is called and execute the
