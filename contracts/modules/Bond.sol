@@ -356,4 +356,81 @@ contract BondiiProBond is Ownable {
         return payout; 
     }
     
+
+    /**
+     *  @notice calculate how far into vesting a depositor is
+     *  @param _depositor address
+     *  @return percentVested_ uint
+     */
+    function percentVestedFor( address _depositor, uint256 _index ) public view returns ( uint percentVested_ ) {
+        Bond memory bond = bondInfo[ _depositor ][_index];
+        uint256 blocksSinceLast = block.number.sub( bond.lastBlock );
+        uint256 vesting = bond.vesting;
+
+        if ( vesting > 0 ) {
+            percentVested_ = blocksSinceLast.mul( 10000 ).div( vesting );
+        } else {
+            percentVested_ = 0;
+        }
+    }
+
+
+    /// @notice this is a function that would be used to fetch all the bond a users has 
+    /// @param _depositor: this is the depositior address 
+    function fetchUserBonds(address _depositor) external view returns(Bond[] memory) {
+        return bondInfo[_depositor];
+    }
+
+
+
+    /** 
+     *  @notice redeem bond for user
+     *  @return uint
+     */ 
+    function redeem(address _depositor, address _principalToken, uint256 _index) external returns (uint) {
+        Bond memory info = bondInfo[ _depositor ][_index];
+        uint percentVested = percentVestedFor( _depositor, _index ); // (blocks since last interaction / vesting term remaining)
+
+        if ( percentVested >= 10000 ) { // if fully vested
+            delete bondInfo[ _depositor ][_index]; // delete user info
+            emit BondRedeemed( _depositor, info.payout, 0 ); // emit bond data
+            payoutToken.safeTransfer( _depositor, info.payout );
+            return info.payout;
+        } else { // if unfinished
+            // calculate payout vested
+            uint payout = info.payout.mul( percentVested ).div( 10000 );
+
+            // store updated deposit info
+            bondInfo[ _depositor ][_index] = Bond({
+                payout: info.payout.sub( payout ),
+                vesting: info.vesting.sub( block.number.sub( info.lastBlock ) ),
+                lastBlock: block.number,
+                truePricePaid: info.truePricePaid,
+                principalToken: info.principalToken
+            });
+
+            emit BondRedeemed( _depositor, payout, bondInfo[ _depositor ][_index].payout );
+            payoutToken.safeTransfer( _depositor, payout );
+            return payout;
+        }
+    }
+
+
+    /**
+     *  @notice calculate amount of payout token available for claim by depositor
+     *  @param _depositor address
+     *  @return pendingPayout_ uint
+     */
+    function pendingPayoutFor( address _depositor, uint256 _index ) external view returns ( uint pendingPayout_ ) {
+        uint percentVested = percentVestedFor( _depositor, _index);
+        uint payout = bondInfo[ _depositor ][_index].payout;
+
+        if ( percentVested >= 10000 ) {
+            pendingPayout_ = payout;
+        } else {
+            pendingPayout_ = payout.mul( percentVested ).div( 10000 );
+        }
+    }
+
+
 }
