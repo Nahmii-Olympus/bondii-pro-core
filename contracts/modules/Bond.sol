@@ -103,7 +103,7 @@ contract BondiiProBond is Ownable {
     ) {
         require( _customTreasury != address(0) );
         customTreasury = ITreasury( _customTreasury );
-        payoutToken = IERC20( ITreasury(_customTreasury).payoutToken());
+        payoutToken = IERC20( ITreasury(_customTreasury).bondPayoutToken());
         require( _initialOwner != address(0) );
         policy = _initialOwner;
     }

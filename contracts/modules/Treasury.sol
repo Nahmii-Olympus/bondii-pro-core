@@ -64,13 +64,12 @@ contract Treasury is Ownable {
 
     /**
      *  @notice bond contract recieves payout tokens
-     *  @param _payout_token_address address
+     *  @param _staking_contract address
      *  @param _amount uint
      */
-    function sendStakingReward(address _payout_token_address, uint _amount) external {
-        require(stakingContract[_payout_token_address], "address is not a staking contract");
-        IERC20(stakingPayoutToken).safeTransfer(msg.sender, _amount);
-        emit StakingReward(_payout_token_address, _amount);
+    function sendStakingReward(address _staking_contract, uint256 _amount) external onlyPolicy {
+        IERC20(stakingPayoutToken).safeTransfer(_staking_contract, _amount);
+        emit StakingReward(_staking_contract, _amount);
     }
 
 
@@ -92,21 +91,15 @@ contract Treasury is Ownable {
         emit BondContractDewhitelisted(_bondContract);
     }
 
-    /**
-        @notice whitelist staking contract
-        @param _new_staking address
-     */
-    function whitelistStakingContract(address _new_staking) external onlyPolicy() {
-        stakingContract[_new_staking] = true;
-        emit StakingContractWhitelisted(_new_staking);
-    }
 
     /**
-        @notice dewhitelist staking contract
-        @param _stakingContract address
+    *   @notice returns payout token valuation of priciple
+    *   @param _principalTokenAddress address
+    *   @param _amount uint
+    *   @return value_ uint
      */
-    function dewhitelistStakingContract(address _stakingContract) external onlyPolicy() {
-        stakingContract[_stakingContract] = false;
-        emit StakingContractDewhitelisted(_stakingContract);
+    function valueOfToken( address _principalTokenAddress, uint _amount ) public view returns ( uint value_ ) {
+        // convert amount to match payout token decimals
+        value_ = _amount.mul( 10 ** IERC20( bondPayoutToken ).decimals() ).div( 10 ** IERC20( _principalTokenAddress ).decimals() );
     }
 }
