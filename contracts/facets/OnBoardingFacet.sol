@@ -41,7 +41,7 @@ contract OnBoardFacet {
         address _rewardsToken,
         uint256 _rewardsDuration
     ) external {
-        onlyDAO;
+        // onlyDAO;
 
         Treasury _treasury = new Treasury(_bondPayoutToken, _stakingPayoutToken);
 
