@@ -13,6 +13,5 @@ struct OnBoarding {
     address stakingFactory;
     address bondiiTreasury;
     address bondiiDA0;
-
-    mapping (address => OnBoardAddress) protocolOnBoard;
+    mapping(address => OnBoardAddress) protocolOnBoard;
 }

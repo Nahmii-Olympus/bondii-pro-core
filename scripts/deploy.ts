@@ -19,21 +19,12 @@ export async function deployDiamond() {
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
 
-  /// Deploy BondiiTreasury
-
-  /// Deploy BondiiProFactoryStorage
-
-  /// Deploy BondiiProSubsidyRouter
-
-  /// Deploy StakingFactory
-
-  /// Deploy BondiiDAO
-
   // deploy Diamond
   const Diamond = await ethers.getContractFactory("Diamond");
   const diamond = await Diamond.deploy(
     contractOwner.address,
-    diamondCutFacet.address
+    diamondCutFacet.address,
+    contractOwner.address
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);
@@ -54,7 +45,6 @@ export async function deployDiamond() {
     "OwnershipFacet",
     "AccessControl",
     "OnBoardingFacet",
-    "ProtocolRouterFacet",
   ];
   const cut = [];
   for (const FacetName of FacetNames) {
