@@ -15,15 +15,7 @@ import {OnBoarding} from "./libraries/LibAppStorage.sol";
 contract Diamond {
     OnBoarding internal ob;
 
-    constructor(
-        address _contractOwner,
-        address _diamondCutFacet,
-        address _bondiiTreasury,
-        address _bondiiProFactoryStorage,
-        address _bondiiProSubsidyRouter,
-        address _stakingFactory,
-        address _bondiiDAO
-    ) payable {
+    constructor(address _contractOwner, address _diamondCutFacet, address _bondiiDAO) payable {
         LibDiamond.setContractOwner(_contractOwner);
 
         // Add the diamondCut external function from the diamondCutFacet
@@ -33,14 +25,6 @@ contract Diamond {
         cut[0] = IDiamondCut.FacetCut({facetAddress: _diamondCutFacet, action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors});
         LibDiamond.diamondCut(cut, address(0), "");
 
-        require(_bondiiTreasury != address(0));
-        ob.bondiiTreasury = _bondiiTreasury;
-        require(_bondiiProFactoryStorage != address(0));
-        ob.bondiiProFactoryStorage = _bondiiProFactoryStorage;
-        require(_bondiiProSubsidyRouter != address(0));
-        ob.bondiiProSubsidyRouter = _bondiiProSubsidyRouter;
-        require(_stakingFactory != address(0));
-        ob.stakingFactory = _stakingFactory;
         require(_bondiiDAO != address(0));
         ob.bondiiDA0 = _bondiiDAO;
     }

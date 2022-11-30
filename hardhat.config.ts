@@ -17,9 +17,6 @@ module.exports = {
   mocha: {
     timeout: 100000000,
   },
-  etherscan: {
-    apiKey: process.env.POLYGONSCAN_API_KEY,
-  },
   networks: {
     hardhat: {
       blockGasLimit: 20000000,
@@ -33,6 +30,9 @@ module.exports = {
       url: process.env.ALCHEMY_MUMBAI_URL,
       accounts: [process.env.PRIVATE_KEY],
     },
+  },
+  etherscan: {
+    apiKey: process.env.POLYGONSCAN_API_KEY,
   },
   gasReporter: {
     currency: "USD",
