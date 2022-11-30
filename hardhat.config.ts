@@ -7,6 +7,7 @@ import "@nomiclabs/hardhat-etherscan";
 require("hardhat-contract-sizer");
 require("dotenv").config();
 require("solidity-coverage");
+// require("hardhat-tracer");
 
 // You have to export an object to set up your config
 // This object can have the following optional entries:
@@ -16,9 +17,9 @@ module.exports = {
   mocha: {
     timeout: 100000000,
   },
-  // etherscan: {
-  //   apiKey: process.env.ETHERSCAN_API_KEY,
-  // },
+  etherscan: {
+    apiKey: process.env.POLYGONSCAN_API_KEY,
+  },
   networks: {
     hardhat: {
       blockGasLimit: 20000000,
@@ -28,13 +29,10 @@ module.exports = {
     localhost: {
       timeout: 8000000,
     },
-    // mumbai: {
-    //   url: process.env.KOVAN_URL,
-    //   accounts: [process.env.SECRET],
-    //   blockGasLimit: 200000000000,
-    //   gasPrice: 10000000000,
-    //   timeout: 90000,
-    // },
+    mumbai: {
+      url: process.env.ALCHEMY_MUMBAI_URL,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
   gasReporter: {
     currency: "USD",
