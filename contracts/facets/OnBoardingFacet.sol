@@ -7,7 +7,7 @@ import {Treasury} from "../modules/Treasury.sol";
 import {OnBoarding, OnBoardAddress} from "../libraries/LibAppStorage.sol";
 
 /// @notice this contract would be used to onboard new protocol in the application
-contract OnBoardFacet {
+contract OnBoardingFacet {
     OnBoarding internal ob;
 
     event TreasuryDeployed(address treasury_addr, address _bondPayoutToken, address _stakingPayoutToken, uint256 time);
