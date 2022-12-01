@@ -4,17 +4,17 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Signer that would be making changes: " + deployer.address);
 
-  const KiwiLabsPayoutToken = "0xFdc78DA8Bbd584C6f6E14468c77b6f09105CA63f";
-  const KiwiLabsPrincipalToken = "0xaDBA987955Eac146f1983062100046be46e632fA";
+  const KiwiLabsPayoutToken = "0xD90bE8d98f56b8B6B1Cc22f42bc990290032bC49";
+  const KiwiLabsPrincipalToken = "0x0eE5D566BF57e8449809dc32D4B92BB2575b5848";
 
-  const KiwiPayoutToken = "0x9e92DE115F6c5a66c77062434Fa4F787Fd32daa9";
-  const KiwiPrincipalToken = "0xE9d590484Cf0e68FF30bb5589658CD9B6cEd096f";
+  const KiwiPayoutToken = "0x7DC7a2e041e1a03E1A378AEC5FFAC25D6C3E0795";
+  const KiwiPrincipalToken = "0x86f515845c3451742d1dB85B77Fd53f83fA1D393";
 
-  const BondiiPayoutToken = "0x0519C43Cdf9B75Ba0a265B3330655A0cAF6D4ED3";
-  const BondiiPrincipalToken = "0x1d4657f5dD44ff59E14973862e0749978B74A7c0";
+  const BondiiPayoutToken = "0x5FB8d67252bA547C11edafFF83721C776108e2f9";
+  const BondiiPrincipalToken = "0x5E15fAD1aFf0FF891d5165E27c19e974F660F600";
 
-  const FarmiiPayoutToken = "0xD410219f5C87247d3F109695275A70Da7805f1b1";
-  const FarmiiPrincipalToken = "0x5C8f5D80FD653a885832dF5c1f09978C81A8cDC4";
+  const FarmiiPayoutToken = "0xDd06e25CD5Ef89d744Bc8c0A723688ddbb00aDE7";
+  const FarmiiPrincipalToken = "0x8Af5405ab3C84E7aE6928f4848739E2950D0cD05";
 
   const RecieverAddress = "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7";
   const sendAmount = ethers.utils.parseEther("1000");
