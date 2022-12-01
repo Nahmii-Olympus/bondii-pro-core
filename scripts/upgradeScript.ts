@@ -11,15 +11,12 @@ export async function upgradeDiamond() {
     const accounts = await ethers.getSigners();
     const contractOwner = accounts[0];
 
-    const DIAMOND_ADDRESS = "";
+    const DIAMOND_ADDRESS = "0x9eae3E4aF957137C0079DA73baa3484318e92BE2";
     const diamondCut = await ethers.getContractAt("DiamondCutFacet", DIAMOND_ADDRESS);
 
     console.log("Deploying facets");
     const FacetNames = [
-      "DiamondLoupeFacet",
-      "OwnershipFacet",
-      "AccessControl",
-      "OnBoardingFacet",
+      "UpgradeTreasuryAddressFacet"
     ];
     const cut = [];
     for (const FacetName of FacetNames) {
