@@ -7,7 +7,6 @@ import "../interfaces/IERC20.sol";
 import "./Ownable.sol";
 
 contract Treasury is Ownable {
-
     /**
      * ===================================================
      * ----------------- LIBRARIES -----------------------
@@ -23,7 +22,7 @@ contract Treasury is Ownable {
      */
     address public immutable bondPayoutToken;
     address public immutable stakingPayoutToken;
-    mapping(address => bool) public bondContract; 
+    mapping(address => bool) public bondContract;
     mapping(address => bool) public stakingContract;
 
     /**
@@ -38,19 +37,16 @@ contract Treasury is Ownable {
     event BondPayoutToken(address, uint);
     event StakingReward(address, uint);
 
-
     /// @param _bondPayoutToken: This is the token that would be used to pay the user who purchases the bond
     /// @param _stakingPayoutToken: This is the token that would be used to pay the user who stakes
     constructor(address _bondPayoutToken, address _stakingPayoutToken) {
-        require( _bondPayoutToken != address(0) );
+        require(_bondPayoutToken != address(0));
         bondPayoutToken = _bondPayoutToken;
-        require( _stakingPayoutToken != address(0) );
-        stakingPayoutToken = _stakingPayoutToken;   
+        require(_stakingPayoutToken != address(0));
+        stakingPayoutToken = _stakingPayoutToken;
     }
 
-
-
-        // state variable for Treasury present in the app storage
+    // state variable for Treasury present in the app storage
 
     /**
      *  @notice bond contract recieves payout tokens
@@ -72,12 +68,11 @@ contract Treasury is Ownable {
         emit StakingReward(_staking_contract, _amount);
     }
 
-
     /**
         @notice whitelist bond contract
         @param _new_bond address
      */
-    function whitelistBondContract(address _new_bond) external onlyPolicy() {
+    function whitelistBondContract(address _new_bond) external onlyPolicy {
         bondContract[_new_bond] = true;
         emit BondContractWhitelisted(_new_bond);
     }
@@ -86,20 +81,22 @@ contract Treasury is Ownable {
         @notice dewhitelist bond contract
         @param _bondContract address
      */
-    function dewhitelistBondContract(address _bondContract) external onlyPolicy() {
+    function dewhitelistBondContract(address _bondContract) external onlyPolicy {
         bondContract[_bondContract] = false;
         emit BondContractDewhitelisted(_bondContract);
     }
 
-
     /**
-    *   @notice returns payout token valuation of priciple
-    *   @param _principalTokenAddress address
-    *   @param _amount uint
-    *   @return value_ uint
+     *   @notice returns payout token valuation of priciple
+     *   @param _principalTokenAddress address
+     *   @param _amount uint
+     *   @return value_ uint
      */
-    function valueOfToken( address _principalTokenAddress, uint _amount ) public view returns ( uint value_ ) {
+    function valueOfToken(address _principalTokenAddress, uint _amount) public view returns (uint value_) {
         // convert amount to match payout token decimals
-        value_ = _amount.mul( 10 ** IERC20( bondPayoutToken ).decimals() ).div( 10 ** IERC20( _principalTokenAddress ).decimals() );
+        value_ = _amount.mul(10 ** IERC20(bondPayoutToken).decimals()).div(10 ** IERC20(_principalTokenAddress).decimals());
     }
 }
+
+
+
