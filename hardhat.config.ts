@@ -28,11 +28,11 @@ module.exports = {
     },
     mumbai: {
       url: process.env.ALCHEMY_MUMBAI_URL,
-      accounts: [process.env.PRIVATE_KEY, process.env.PROTOCOL_ONE, process.env.PROTOCOL_TWO, process.env.PROTOCOL_THREE, process.env.PROTOCOL_FOUR ],
+      accounts: [process.env.PRIVATE_KEY],
     },
   },
   etherscan: {
-    apiKey: process.env.POLYGONSCAN_API_KEY
+    apiKey: process.env.POLYGONSCAN_API_KEY,
   },
   gasReporter: {
     currency: "USD",
