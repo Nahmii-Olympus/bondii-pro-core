@@ -16,7 +16,7 @@ async function main() {
   const FarmiiPayoutToken = "0xDd06e25CD5Ef89d744Bc8c0A723688ddbb00aDE7";
   const FarmiiPrincipalToken = "0x8Af5405ab3C84E7aE6928f4848739E2950D0cD05";
 
-  const RecieverAddress = "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7";
+  const RecieverAddress = "0x85f20a6924A61904AB44243C7e2c771B3bE46734";
   const sendAmount = ethers.utils.parseEther("1000");
 
   // KIWII LABS
