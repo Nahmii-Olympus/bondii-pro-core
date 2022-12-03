@@ -11,7 +11,7 @@ contract UpgradeTreasuryAddressFacet {
     /// @param _oldAddress: previous address of the treasury owner
     /// @param _newAddress: new addresss of the treasury owner
     function changeTreasuryOwnerAddress(address _oldAddress, address _newAddress) external {
-        if (_newAddress != address(0) || _oldAddress != address(0)) {
+        if (_newAddress == address(0) || _oldAddress == address(0)) {
             revert CannotBeAddressZero();
         }
         IOwnable(_oldAddress).transferManagment(_newAddress);
