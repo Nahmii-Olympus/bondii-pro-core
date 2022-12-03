@@ -17,7 +17,7 @@ export async function changeTreasuryAddress() {
 
   const changeTreasuryAddressTxn =
     await changeTreasuryAddress.changeTreasuryOwnerAddress(
-      "0x38a5e8ce331b7873dbbf6eaa9cb0fba8f42dde81",
+      "0x01b5ae984ea55345aeae4023dfd1fd7b2192acd0",
       "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7"
     );
 

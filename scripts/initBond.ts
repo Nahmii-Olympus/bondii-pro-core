@@ -3,10 +3,10 @@ import { ethers } from "hardhat";
 async function main() {
     const [kiwi_labs, kiwi, bondii, farmii] = await ethers.getSigners();
 
-  const BOND_ONE = "0xb1a10c237c3e58bca1a364b29c490d0841878d4d";
-  const BOND_TWO = "0x753a05f136797819715fc3063aaedafff5ecc74f";
-  const BOND_THREE = "0x8ba8ba5662a85b429bab961de4994aad74dd885b";
-  const BOND_FOUR = "0x71e302878b2714c2f9b64a70001aa6835629dd33";
+  const BOND_ONE = "0x4dda2a30c977ca2620311fd1f79ef7075f666cf9";
+  const BOND_TWO = "0x48344c64265853c250ba1342682bea2d0d0a8284";
+  const BOND_THREE = "0x707f6894782cc32fefb22ad583a1665e5434e77f";
+  const BOND_FOUR = "0x259ca7662afd95c83bfc91c3b1620be754a2fb33";
 
 
   const bondOne = await ethers.getContractAt("BondiiProBond", BOND_ONE);

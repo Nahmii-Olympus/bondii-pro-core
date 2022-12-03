@@ -28,6 +28,7 @@ module.exports = {
     },
     mumbai: {
       url: process.env.ALCHEMY_MUMBAI_URL,
+      // accounts: [process.env.PRIVATE_KEY],
       accounts: [process.env.PRIVATE_KEY],
     },
   },
