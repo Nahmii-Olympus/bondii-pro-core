@@ -15,7 +15,7 @@ export async function upgradeDiamond() {
   );
 
   console.log("Deploying facets");
-  const FacetNames = ["UpgradeTreasuryAddressFacet"];
+  const FacetNames = ["OnBoardingFacet"];
   const cut = [];
   for (const FacetName of FacetNames) {
     const Facet = await ethers.getContractFactory(FacetName);

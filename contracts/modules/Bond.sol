@@ -332,7 +332,8 @@ contract BondiiProBond is Ownable {
                 
         // depositor info is stored
         Bond memory d = Bond({ 
-            payout: bondInfo[ _depositor ][ bondInfo[ _depositor ].length].payout.add( payout ),
+            // payout: bondInfo[ _depositor ][ bondInfo[ _depositor ].length].payout.add(  ),
+            payout: payout,
             vesting: terms[_principalToken].vestingTerm,
             lastBlock: block.number,
             truePricePaid: bondPrice(_principalToken),
