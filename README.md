@@ -8,9 +8,10 @@
 
 The mechanism implemented by PolyBond is called Protocol Owned Liquidity (POL) and it was pioneered by Olympus DAO. It has been termed DeFi 2.0.
 
-[Here]() is a short video explaining how PolyBond works.
+[Here](https://youtu.be/ESgmX1-fAh4) is a short video explaining how PolyBond works.
+[Here](https://docs.google.com/presentation/d/11J2I-2a_Mxl788OFwMz4VhndumFG2BSmNKjU_8wZeKw/edit?usp=sharing) are slides that explain Protocol-Owned Liquidity, the concept PolyBond helps execute.
 
-Interact with PolyBond [here.](https://polybond.vercel.app/)
+Interact with PolyBond [here](https://polybond.vercel.app/).
 
 ## Tech Stack
 
