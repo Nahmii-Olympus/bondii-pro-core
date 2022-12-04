@@ -15,14 +15,20 @@ export async function changeTreasuryAddress() {
     DIAMOND_ADDRESS
   );
 
-  const changeTreasuryAddressTxn =
-    await changeTreasuryAddress.changeTreasuryOwnerAddress(
-      "0x01b5ae984ea55345aeae4023dfd1fd7b2192acd0",
-      "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7"
-    );
+    await (await changeTreasuryAddress.changeTreasuryOwnerAddress(
+      "0x63ca9fb2f99da854a4296539708c76cf09ba310d",
+      "0x79A123e40100560f90De9574aBED7CF07cE0a9e6"
+    )).wait();
 
-  const changeTreasuryAddressReceipt = await changeTreasuryAddressTxn.wait();
-  console.log("RECIPT: ", changeTreasuryAddressReceipt);
+    await (await changeTreasuryAddress.changeTreasuryOwnerAddress(
+      "0xa72652da12ff644539bb66b83d3b2b5cadd17503",
+      "0x79A123e40100560f90De9574aBED7CF07cE0a9e6"
+    )).wait();
+
+    await (await changeTreasuryAddress.changeTreasuryOwnerAddress(
+      "0x19f3a1bc9b5d0a4a244067dac8d1ac8cbd9b82a2",
+      "0x79A123e40100560f90De9574aBED7CF07cE0a9e6"
+    )).wait();
 
   console.log("Completed diamond cut");
 }
